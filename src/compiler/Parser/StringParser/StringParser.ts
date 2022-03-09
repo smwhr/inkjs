@@ -16,7 +16,7 @@ export type ParseRuleReturn =
 
 export type SpecificParseRule<T extends ParseRule> = T;
 
-export abstract class StringParser {
+export class StringParser {
   public ParseRule: ParseRule | null = null;
 
   public static readonly ParseSuccess: typeof ParseSuccess = ParseSuccess;
@@ -303,8 +303,11 @@ export abstract class StringParser {
     return null;
   };
 
-  public readonly Optional = (rule: ParseRule): ParseRule => () =>
-    this.ParseObject(rule) || StringParser.ParseSuccess;
+  public readonly Optional = (rule: ParseRule): ParseRule => () => {
+    const result = this.ParseObject(rule);
+    if (result === null) return StringParser.ParseSuccess;
+    return result;
+  };
 
   // Return ParseSuccess instead the real result so that it gets excluded
   // from result arrays (e.g. Interleave)

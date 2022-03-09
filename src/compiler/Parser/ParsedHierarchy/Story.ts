@@ -156,16 +156,12 @@ export class Story extends FlowBase {
     this.constants = new Map();
     for (const constDecl of this.FindAll(ConstantDeclaration)()) {
       // Check for duplicate definitions
-      const existingDefinition:
-        | ConstantDeclaration
-        | null
-        | undefined = this.constants.get(constDecl.constantName!) as any;
+      const existingDefinition: Expression = this.constants.get(
+        constDecl.constantName!
+      ) as any;
 
       if (existingDefinition) {
-        const runObj = existingDefinition.GenerateRuntimeObject() || {
-          Equals: () => false,
-        };
-        if (!runObj.Equals(constDecl.expression)) {
+        if (!existingDefinition.Equals(constDecl.expression)) {
           const errorMsg = `CONST '${constDecl.constantName}' has been redefined with a different value. Multiple definitions of the same CONST are valid so long as they contain the same value. Initial definition was on ${existingDefinition.debugMetadata}.`;
           this.Error(errorMsg, constDecl, false);
         }
@@ -562,7 +558,7 @@ export class Story extends FlowBase {
     }
 
     // Stitches, Choices and Gathers
-    const path = new Path(this.identifier!);
+    const path = new Path(identifier);
     const targetContent = path.ResolveFromContext(obj);
     if (targetContent && targetContent !== obj) {
       this.NameConflictError(
@@ -589,7 +585,7 @@ export class Story extends FlowBase {
         for (const arg of flow.args) {
           if (arg.identifier?.name === identifier?.name) {
             obj.Error(
-              `${typeNameToPrint} '${identifier}': Name has already been used for a argument to ${flow.identifier} on ${flow.debugMetadata}`
+              `${typeNameToPrint} '${identifier}': name has already been used for a argument to ${flow.identifier} on ${flow.debugMetadata}`
             );
 
             return;
